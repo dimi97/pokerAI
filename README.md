@@ -6,7 +6,7 @@ Welcome to the pokerAI wiki!
 
 pokerAI.name="**PzkD**";
 
-![123](https://www.gutshotmagazine.com/uploads/news/5691.jpg)
+![Texas Holdem](https://cdnph.upi.com/svc/sv/upi_com/6431429965877/2015/1/96a868bf0161e635401d1daa83df8a0d/Brains-vs-AI-Computer-faces-poker-pros-in-no-limit-Texas-Holdem.jpg)
 
 ## The Neural Network:
 
