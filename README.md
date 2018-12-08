@@ -1,0 +1,2 @@
+# pokerAI
+AI playing poker.
