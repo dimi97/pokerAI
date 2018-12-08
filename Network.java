@@ -1,0 +1,271 @@
+package network;
+
+import java.util.Random;
+
+public class Network {
+	//input number
+	
+	private int inputNumber=7;
+	
+	//inputs
+private int c1;
+private double money;
+private double opponentMoney;
+private double potMoney;
+private int position;
+private double opponentAction;
+private double bb;
+
+//input vector
+
+private double inputs[]=new double[this.inputNumber];
+
+
+//weights and biases
+private double weights[][]=new double [this.inputNumber][this.inputNumber];
+private double biases[]=new double [this.inputNumber];
+
+private double zA[]=new double [this.inputNumber];
+
+private double wA[]=new double [this.inputNumber];
+private double bA;
+
+//output
+public double z;
+public double output;
+
+//general
+public double lf=0.001;
+
+public Network() {
+	
+}
+
+public void initializewA() {
+	for (int k=0;k<this.inputNumber;k++) {
+		//TODO:Change this to random()!
+		wA[k]=random();
+	}
+}
+
+public void initializebA(){
+	bA=random();
+}
+
+public void setWeights() {
+	int i,k;
+	
+	for (i=0;i<this.inputNumber;i++) {
+		for (k=0;k<this.inputNumber;k++) {
+			//TODO:CHANGE THIS TO RANDOM();!
+			this.weights[i][k]=random();
+		}
+	}
+}
+
+public void setBiases() {
+	for (int i=0;i<7;i++) {
+		this.biases[i]=random();
+	}
+}
+
+public double[] getzA() {
+	return this.zA;
+}
+
+public void setInputs() {
+	this.inputs[0]=(this.c1);
+	this.inputs[1]=(this.money);
+	this.inputs[2]=(this.opponentMoney);
+	this.inputs[3]=(this.potMoney);
+	this.inputs[4]=(this.position);
+	this.inputs[5]=(this.opponentAction);
+	this.inputs[6]=(this.bb);
+}
+
+
+public int getInputNumber() {
+	return inputNumber;
+}
+
+public void setInputNumber(int inputNumber) {
+	this.inputNumber = inputNumber;
+}
+
+public int getC1() {
+	return c1;
+}
+
+public void setC1(int c1) {
+	this.c1 = c1;
+}
+
+public double getMoney() {
+	return money;
+}
+
+public void setMoney(double money) {
+	this.money = money;
+}
+
+public double getOpponentMoney() {
+	return opponentMoney;
+}
+
+public void setOpponentMoney(double opponentMoney) {
+	this.opponentMoney = opponentMoney;
+}
+
+public double getPotMoney() {
+	return potMoney;
+}
+
+public void setPotMoney(double potMoney) {
+	this.potMoney = potMoney;
+}
+
+public int getPosition() {
+	return position;
+}
+
+public void setPosition(int position) {
+	this.position = position;
+}
+
+public double getOpponentAction() {
+	return opponentAction;
+}
+
+public void setOpponentAction(double opponentAction) {
+	this.opponentAction = opponentAction;
+}
+
+public double getBb() {
+	return bb;
+}
+
+public void setBb(double bb) {
+	this.bb = bb;
+}
+
+public double[] getInputs() {
+	return inputs;
+}
+
+
+public double getOutput() {
+	return output;
+}
+
+public void setOutput(double output) {
+	this.output = output;
+}
+
+public double getLf(){
+	return lf;
+}
+
+public void setLf(double lf) {
+	this.lf = lf;
+}
+
+public double[][] getWeights() {
+	return weights;
+}
+
+public double[] getBiases() {
+	return biases;
+}
+
+public double[] getwA() {
+	return wA;
+}
+
+public double getbA() {
+	return bA;
+}
+
+
+public void zACalc() {
+	double resA[]=new double[this.inputNumber];
+	 resA=matrixMultiply(this.inputs,this.weights);
+	 
+	
+	 this.zA=addVectors(resA,biases);
+	 
+}
+
+public double[] matrixMultiply(double m1[],double m2[][]) {
+	double result[]=new double[m1.length];
+	for (int i=0;i<m1.length;i++) {
+		result[i]=0;
+	}
+	
+	
+	for (int i=0;i<m1.length;i++) {
+		for (int j=0;j<m1.length;j++) {
+			
+			result[i]+=(m1[j])*(m2[j][i]);
+		}
+	}
+	
+	return result;
+}
+
+public double[] addVectors(double v1[],double v2[]) {
+	double result[]=new double[v1.length];
+	
+	for (int i=0;i<v1.length;i++) {
+		result[i]=v1[i]+v2[i];
+	}
+	
+	return result;
+}
+
+
+public void zCalc() {
+	zACalc();
+	
+	double myZ=dotProduct(zA,wA)+bA;
+	
+this.z=myZ;
+}
+
+public double dotProduct(double m1[],double m2[]) {
+	double dProduct=0;
+	for (int i=0;i<m1.length;i++) {
+		dProduct+=m1[i]*m2[i];
+	}
+	
+	return dProduct;
+}
+
+
+
+
+public void outputCalc() {
+	zCalc();
+	this.output=sig(z);
+}
+
+public double sig(double z) {
+	return 1/(1+Math.exp(-z));
+}
+
+public double getZ() {
+	return z;
+}
+
+public void setZ(double z) {
+	this.z = z;
+}
+
+public double random() {
+	Random rand = new Random();
+	int r = rand.nextInt(21) -10;
+	double rd=(r)/100.0;
+	
+return rd;
+}
+
+}
