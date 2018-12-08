@@ -5,7 +5,7 @@ import java.util.Random;
 public class Network {
 	//input number
 	
-	private int inputNumber=7;
+	private int inputNumber=9;
 	
 	//inputs
 private int c1;
@@ -13,8 +13,12 @@ private double money;
 private double opponentMoney;
 private double potMoney;
 private int position;
-private double opponentAction;
 private double bb;
+private double bets;
+private double rBet;
+private double toCall;
+
+
 
 //input vector
 
@@ -64,7 +68,7 @@ public void setWeights() {
 }
 
 public void setBiases() {
-	for (int i=0;i<7;i++) {
+	for (int i=0;i<this.inputNumber;i++) {
 		this.biases[i]=random();
 	}
 }
@@ -79,10 +83,27 @@ public void setInputs() {
 	this.inputs[2]=(this.opponentMoney);
 	this.inputs[3]=(this.potMoney);
 	this.inputs[4]=(this.position);
-	this.inputs[5]=(this.opponentAction);
+	this.inputs[5]=(this.bets);
 	this.inputs[6]=(this.bb);
+	this.inputs[7]=(this.toCall);
+	this.inputs[8]=(this.rBet);
 }
 
+public double getrBet() {
+	return rBet;
+}
+
+public void setrBet(double rBet) {
+	this.rBet = rBet;
+}
+
+public double getToCall() {
+	return toCall;
+}
+
+public void setToCall(double toCall) {
+	this.toCall = toCall;
+}
 
 public int getInputNumber() {
 	return inputNumber;
@@ -132,12 +153,12 @@ public void setPosition(int position) {
 	this.position = position;
 }
 
-public double getOpponentAction() {
-	return opponentAction;
+public double getBets() {
+	return bets;
 }
 
-public void setOpponentAction(double opponentAction) {
-	this.opponentAction = opponentAction;
+public void setBets(double bets) {
+	this.bets = bets;
 }
 
 public double getBb() {

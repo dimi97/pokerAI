@@ -1,22 +1,4 @@
-//TODO: GAME 9
 
-/**
-----------------
-Player Player 1 Posts 1.0$ small blind.
-Player Engine Posts 2.0$ big blind.
-Player Player 1 it's your turn to act.
-Player 1 Raises to 4.0$
-Player Engine it's your turn to act.
-Engine Raises to 8.0$
-Player Player 1 it's your turn to act.
-Player 1 Raises to 10.0$
-Player Engine it's your turn to act.
-Engine Raises to 11.0$
-Player Player 1 it's your turn to act.
-Player 1 Raises to 13.0$
-Player Engine it's your turn to act.
-Engine Raises to 13.0$
-*/
 
 package network;
 
@@ -42,13 +24,20 @@ public class Game {
 	public double raiseLowLimit=bb*2;
 	public Player allPlayers[] = new Player[maxPlayers];
 	public int winners;
+	public int bets;
+	
+	
+	//Begin Main!----------------------------
+	//Begin Main!----------------------------
+	//Begin Main!----------------------------
+	//Begin Main!----------------------------
+	//Begin Main!----------------------------
+	//Begin Main!----------------------------
 
 	public static void main(String[] args) {
 		Game myGame = new Game();
 
-		// General
-
-		// Initialization
+		
 
 		createPlayers(myGame);
 
@@ -63,47 +52,11 @@ public class Game {
 
 			// Change Player Positions and Post Blinds
 
-			for (k = 0; k < myGame.maxPlayers; k++) {
-				
-				myGame.allPlayers[k].Position++;
-				
-				if (myGame.allPlayers[k].Position > myGame.maxPlayers) {
-					myGame.allPlayers[k].Position = 1;
-				}
-
-				if (myGame.allPlayers[k].Position == 1) {
-					myGame.sbPos = k;
-
-				} else if (myGame.allPlayers[k].Position == 2) {
-					myGame.bbPos = k;
-				}
-
-			}
+			changePositions(myGame);
 
 			// Post Blinds
 
-			myGame.allPlayers[myGame.sbPos].Money -= myGame.sb;
-			myGame.allPlayers[myGame.sbPos].potMoney += myGame.sb;
-			myGame.pot += myGame.sb;
-			myGame.allPlayers[myGame.sbPos].rBet = myGame.sb;
-
-			System.out.println(
-					"Player " + myGame.allPlayers[myGame.sbPos].Name + " Posts " + myGame.sb + "$ small blind.");
-
-			myGame.allPlayers[myGame.bbPos].Money -= myGame.bb;
-			myGame.allPlayers[myGame.bbPos].potMoney += myGame.bb;
-			myGame.pot += myGame.bb;
-			myGame.maxBet = myGame.bb;
-			myGame.allPlayers[myGame.bbPos].rBet = myGame.bb;
-
-			System.out
-					.println("Player " + myGame.allPlayers[myGame.bbPos].Name + " Posts " + myGame.bb + "$ big blind.");
-
-			// Deal Cards
-
-			Random rand = new Random();
-			myGame.allPlayers[0].Card1 = rand.nextInt(10) + 1;
-			myGame.allPlayers[1].Card1 = rand.nextInt(10) + 1;
+			postBlinds(myGame);
 
 			// Player actions
 
@@ -145,8 +98,10 @@ public class Game {
 								Neural.setOpponentMoney(myGame.allPlayers[0].Money);
 								Neural.setPotMoney(myGame.pot);
 								Neural.setPosition(myGame.allPlayers[1].Position);
-								Neural.setOpponentAction(myGame.allPlayers[0].rBet);
+								Neural.setBets(myGame.bets);
 								Neural.setBb(myGame.bb);
+								Neural.setToCall(myGame.maxBet-myGame.allPlayers[1].rBet);
+								Neural.setrBet(myGame.allPlayers[1].rBet);
 
 								Neural.setInputs();
 
@@ -178,19 +133,7 @@ public class Game {
 
 			}
 
-			if (myGame.activePlayers == 1) {
-				for (int i = 0; i < myGame.maxPlayers; i++) {
-					if (myGame.allPlayers[i].status == 1) {
-						myGame.allPlayers[i].winner =1;
-						myGame.allPlayers[i].wins++;
-						myGame.winners=1;
-						myGame.payWinner(myGame);
-					}
-				}
-			} else {
-				myGame.checkWinner(myGame);
-				myGame.payWinner(myGame);
-			}
+			findWinner(myGame);
 
 			
 			
@@ -202,59 +145,109 @@ public class Game {
 
 			// (int i,int c1,int c2,double weight,double output,
 			// double result,double foldRat,double prediction)
-			if ((myGame.round) % myGame.printFactor == 0) {
-				printGame(myGame.round, myGame.allPlayers[0].Card1, myGame.allPlayers[1].Card1, Neural.getWeights(),
-						Neural.output, myGame.result, Neural.getOutput(), Neural.getBiases(),
-						myGame.allPlayers[0].Money, myGame.allPlayers[1].Money, myGame.pot, Neural.getwA(),
-						Neural.getbA(), Neural.getzA(), Neural.getInputs(), Neural.getZ());
-			}
+			controlledPrintGame(myGame, Neural);
 
 			// Check if busted
 
-			for (int j = 0; j < myGame.maxPlayers; j++) {
-				if (myGame.allPlayers[j].Money == 0) {
-
-					System.out.println(
-							"GAME OVER after " + myGame.round + " rounds." + myGame.allPlayers[j].Name + " has lost.");
-					myGame.busted = 1;
-				}
-			}
+			checkEndOfGame(myGame);
 
 			// End Check if busted
 
-			/*
-			 * 
-			 * //Learn
-			 * 
-			 * Neural.setWeight(Neural.getWeights() + learn(myGame.result,
-			 * Neural.getOutput(), Neural.getInputs(), Neural.getZ(), Neural.getLf()));
-			 * Neural.setB(Neural.getBiases() + learnB(myGame.result, Neural.getOutput(),
-			 * Neural.getInputs(), Neural.getZ(), Neural.getLf()));
-			 * 
-			 * 
-			 * Neural.outputCalc();
-			 * 
-			 * 
-			 * 
-			 * if ((myGame.round) % myGame.printFactor == 0) {
-			 * printNewNetwork(Neural.getWeights(), Neural.getOutput()); }
-			 */
-
-			// End Learn
+		
 			myGame.round++;
 			
 		}
 
-		// Stats
+		
 
 		printStats(myGame);
 
-		// End Stats
+		
+		
+		
+		//End of round
+		
+	}
 
-		//End game
-		
-		//End end game
-		
+	public static void checkEndOfGame(Game myGame) {
+		for (int j = 0; j < myGame.maxPlayers; j++) {
+			if (myGame.allPlayers[j].Money == 0) {
+
+				System.out.println(
+						"GAME OVER after " + myGame.round + " rounds." + myGame.allPlayers[j].Name + " has lost.");
+				myGame.busted = 1;
+			}
+		}
+	}
+
+	public static void controlledPrintGame(Game myGame, Network Neural) {
+		if ((myGame.round) % myGame.printFactor == 0) {
+			printGame(myGame.round, myGame.allPlayers[0].Card1, myGame.allPlayers[1].Card1, Neural.getWeights(),
+					Neural.output, myGame.result, Neural.getOutput(), Neural.getBiases(),
+					myGame.allPlayers[0].Money, myGame.allPlayers[1].Money, myGame.pot, Neural.getwA(),
+					Neural.getbA(), Neural.getzA(), Neural.getInputs(), Neural.getZ());
+		}
+	}
+
+	public static void findWinner(Game myGame) {
+		if (myGame.activePlayers == 1) {
+			for (int i = 0; i < myGame.maxPlayers; i++) {
+				if (myGame.allPlayers[i].status == 1) {
+					myGame.allPlayers[i].winner =1;
+					myGame.allPlayers[i].wins++;
+					myGame.winners=1;
+					myGame.payWinner(myGame);
+				}
+			}
+		} else {
+			myGame.checkWinner(myGame);
+			myGame.payWinner(myGame);
+		}
+	}
+
+	public static void postBlinds(Game myGame) {
+		myGame.allPlayers[myGame.sbPos].Money -= myGame.sb;
+		myGame.allPlayers[myGame.sbPos].potMoney += myGame.sb;
+		myGame.pot += myGame.sb;
+		myGame.allPlayers[myGame.sbPos].rBet = myGame.sb;
+
+		System.out.println(
+				"Player " + myGame.allPlayers[myGame.sbPos].Name + " Posts " + myGame.sb + "$ small blind.");
+
+		myGame.allPlayers[myGame.bbPos].Money -= myGame.bb;
+		myGame.allPlayers[myGame.bbPos].potMoney += myGame.bb;
+		myGame.pot += myGame.bb;
+		myGame.maxBet = myGame.bb;
+		myGame.allPlayers[myGame.bbPos].rBet = myGame.bb;
+
+		System.out
+				.println("Player " + myGame.allPlayers[myGame.bbPos].Name + " Posts " + myGame.bb + "$ big blind.");
+
+		// Deal Cards
+
+		Random rand = new Random();
+		myGame.allPlayers[0].Card1 = rand.nextInt(10) + 1;
+		myGame.allPlayers[1].Card1 = rand.nextInt(10) + 1;
+	}
+
+	public static void changePositions(Game myGame) {
+		int k;
+		for (k = 0; k < myGame.maxPlayers; k++) {
+			
+			myGame.allPlayers[k].Position++;
+			
+			if (myGame.allPlayers[k].Position > myGame.maxPlayers) {
+				myGame.allPlayers[k].Position = 1;
+			}
+
+			if (myGame.allPlayers[k].Position == 1) {
+				myGame.sbPos = k;
+
+			} else if (myGame.allPlayers[k].Position == 2) {
+				myGame.bbPos = k;
+			}
+
+		}
 	}
 
 	/// END MAIN -------------------------------------------------------------
@@ -344,7 +337,7 @@ public class Game {
 			double z) {
 		// System.out.println("GAME " + (i));
 		System.out.println("ZKD Card: " + c2);
-		System.out.printf("Neural Inputs (Card,ZKD Money,Opponent Money,Pot,Position,Opponent Action,BB)\n");
+		System.out.printf("Neural Inputs (Card,ZKD Money,Opponent Money,Pot,Position,bets,BB,toCall,rBet)\n");
 		print1dMatrix(inputs);
 
 		System.out.printf("Neural Weights\n");
