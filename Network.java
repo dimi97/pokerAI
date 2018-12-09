@@ -5,7 +5,7 @@ import java.util.Random;
 public class Network {
 	//input number
 	
-	private int inputNumber=9;
+	private int inputNumber=11;
 	
 	//inputs
 private int c1;
@@ -17,10 +17,16 @@ private double bb;
 private double bets;
 private double rBet;
 private double toCall;
+private int activePlayers;
+private int preflopOpponents;
 
 
 
 //input vector
+
+
+
+
 
 private double inputs[]=new double[this.inputNumber];
 
@@ -77,6 +83,22 @@ public double[] getzA() {
 	return this.zA;
 }
 
+public int getPreflopOpponents() {
+	return preflopOpponents;
+}
+
+public void setPreflopOpponents(int preflopOpponents) {
+	this.preflopOpponents = preflopOpponents;
+}
+
+public int getActivePlayers() {
+	return activePlayers;
+}
+
+public void setActivePlayers(int activePlayers) {
+	this.activePlayers = activePlayers;
+}
+
 public void setInputs() {
 	this.inputs[0]=(this.c1);
 	this.inputs[1]=(this.money);
@@ -87,6 +109,8 @@ public void setInputs() {
 	this.inputs[6]=(this.bb);
 	this.inputs[7]=(this.toCall);
 	this.inputs[8]=(this.rBet);
+	this.inputs[9]=(this.activePlayers);
+	this.inputs[10]=(this.preflopOpponents);
 }
 
 public double getrBet() {
@@ -209,10 +233,15 @@ public double getbA() {
 
 public void zACalc() {
 	double resA[]=new double[this.inputNumber];
+	double resB[]=new double[this.inputNumber];
 	 resA=matrixMultiply(this.inputs,this.weights);
-	 
+	 resB=addVectors(resA,biases);
 	
-	 this.zA=addVectors(resA,biases);
+	 for (int i=0;i<this.inputNumber;i++) {
+		 resB[i]=sig(resB[i]);
+	 }
+	 
+	 this.zA=resB;
 	 
 }
 
@@ -284,7 +313,7 @@ public void setZ(double z) {
 public double random() {
 	Random rand = new Random();
 	int r = rand.nextInt(21) -10;
-	double rd=(r)/100.0;
+	double rd=(r)/10.0;
 	
 return rd;
 }

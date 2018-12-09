@@ -1,5 +1,4 @@
 
-
 package network;
 
 import java.util.Random;
@@ -21,23 +20,20 @@ public class Game {
 	public double sb = bb / 2;
 	public int sbPos = -1;
 	public int bbPos = -1;
-	public double raiseLowLimit=bb*2;
+	public double raiseLowLimit = bb * 2;
 	public Player allPlayers[] = new Player[maxPlayers];
 	public int winners;
 	public int bets;
-	
-	
-	//Begin Main!----------------------------
-	//Begin Main!----------------------------
-	//Begin Main!----------------------------
-	//Begin Main!----------------------------
-	//Begin Main!----------------------------
-	//Begin Main!----------------------------
+
+	// Begin Main!----------------------------
+	// Begin Main!----------------------------
+	// Begin Main!----------------------------
+	// Begin Main!----------------------------
+	// Begin Main!----------------------------
+	// Begin Main!----------------------------
 
 	public static void main(String[] args) {
 		Game myGame = new Game();
-
-		
 
 		createPlayers(myGame);
 
@@ -57,6 +53,10 @@ public class Game {
 			// Post Blinds
 
 			postBlinds(myGame);
+			
+			// Deal Cards
+
+			dealCards(myGame);
 
 			// Player actions
 
@@ -100,8 +100,10 @@ public class Game {
 								Neural.setPosition(myGame.allPlayers[1].Position);
 								Neural.setBets(myGame.bets);
 								Neural.setBb(myGame.bb);
-								Neural.setToCall(myGame.maxBet-myGame.allPlayers[1].rBet);
+								Neural.setToCall(myGame.maxBet - myGame.allPlayers[1].rBet);
 								Neural.setrBet(myGame.allPlayers[1].rBet);
+								Neural.setActivePlayers(myGame.activePlayers);
+								Neural.setPreflopOpponents(myGame.maxPlayers);
 
 								Neural.setInputs();
 
@@ -135,14 +137,6 @@ public class Game {
 
 			findWinner(myGame);
 
-			
-			
-			
-			
-			
-			
-			
-
 			// (int i,int c1,int c2,double weight,double output,
 			// double result,double foldRat,double prediction)
 			controlledPrintGame(myGame, Neural);
@@ -153,20 +147,20 @@ public class Game {
 
 			// End Check if busted
 
-		
 			myGame.round++;
-			
-		}
 
-		
+		}
 
 		printStats(myGame);
 
-		
-		
-		
-		//End of round
-		
+		// End of round
+
+	}
+
+	public static void dealCards(Game myGame) {
+		Random rand = new Random();
+		myGame.allPlayers[0].Card1 = rand.nextInt(10) + 1;
+		myGame.allPlayers[1].Card1 = rand.nextInt(10) + 1;
 	}
 
 	public static void checkEndOfGame(Game myGame) {
@@ -183,9 +177,9 @@ public class Game {
 	public static void controlledPrintGame(Game myGame, Network Neural) {
 		if ((myGame.round) % myGame.printFactor == 0) {
 			printGame(myGame.round, myGame.allPlayers[0].Card1, myGame.allPlayers[1].Card1, Neural.getWeights(),
-					Neural.output, myGame.result, Neural.getOutput(), Neural.getBiases(),
-					myGame.allPlayers[0].Money, myGame.allPlayers[1].Money, myGame.pot, Neural.getwA(),
-					Neural.getbA(), Neural.getzA(), Neural.getInputs(), Neural.getZ());
+					Neural.output, myGame.result, Neural.getOutput(), Neural.getBiases(), myGame.allPlayers[0].Money,
+					myGame.allPlayers[1].Money, myGame.pot, Neural.getwA(), Neural.getbA(), Neural.getzA(),
+					Neural.getInputs(), Neural.getZ());
 		}
 	}
 
@@ -193,9 +187,9 @@ public class Game {
 		if (myGame.activePlayers == 1) {
 			for (int i = 0; i < myGame.maxPlayers; i++) {
 				if (myGame.allPlayers[i].status == 1) {
-					myGame.allPlayers[i].winner =1;
+					myGame.allPlayers[i].winner = 1;
 					myGame.allPlayers[i].wins++;
-					myGame.winners=1;
+					myGame.winners = 1;
 					myGame.payWinner(myGame);
 				}
 			}
@@ -206,36 +200,47 @@ public class Game {
 	}
 
 	public static void postBlinds(Game myGame) {
+		double tempsB=myGame.sb;
+		double tempbB=myGame.bb;
+		//Small Blind
+		
+		if (myGame.allPlayers[myGame.sbPos].Money<myGame.sb) {
+			myGame.sb=myGame.allPlayers[myGame.sbPos].Money;
+		}
+		
 		myGame.allPlayers[myGame.sbPos].Money -= myGame.sb;
 		myGame.allPlayers[myGame.sbPos].potMoney += myGame.sb;
 		myGame.pot += myGame.sb;
 		myGame.allPlayers[myGame.sbPos].rBet = myGame.sb;
 
-		System.out.println(
-				"Player " + myGame.allPlayers[myGame.sbPos].Name + " Posts " + myGame.sb + "$ small blind.");
+		System.out.println("Player " + myGame.allPlayers[myGame.sbPos].Name + " Posts " + myGame.sb + "$ small blind.");
 
+		myGame.sb=tempsB;
+		
+		//Big Blind
+		
+		if (myGame.allPlayers[myGame.bbPos].Money<myGame.bb) {
+			myGame.bb=myGame.allPlayers[myGame.bbPos].Money;
+		}
+		
 		myGame.allPlayers[myGame.bbPos].Money -= myGame.bb;
 		myGame.allPlayers[myGame.bbPos].potMoney += myGame.bb;
 		myGame.pot += myGame.bb;
 		myGame.maxBet = myGame.bb;
 		myGame.allPlayers[myGame.bbPos].rBet = myGame.bb;
 
-		System.out
-				.println("Player " + myGame.allPlayers[myGame.bbPos].Name + " Posts " + myGame.bb + "$ big blind.");
+		System.out.println("Player " + myGame.allPlayers[myGame.bbPos].Name + " Posts " + myGame.bb + "$ big blind.");
 
-		// Deal Cards
-
-		Random rand = new Random();
-		myGame.allPlayers[0].Card1 = rand.nextInt(10) + 1;
-		myGame.allPlayers[1].Card1 = rand.nextInt(10) + 1;
+		myGame.bb=tempbB;
+		
 	}
 
 	public static void changePositions(Game myGame) {
 		int k;
 		for (k = 0; k < myGame.maxPlayers; k++) {
-			
+
 			myGame.allPlayers[k].Position++;
-			
+
 			if (myGame.allPlayers[k].Position > myGame.maxPlayers) {
 				myGame.allPlayers[k].Position = 1;
 			}
@@ -259,16 +264,15 @@ public class Game {
 	/// END MAIN -------------------------------------------------------------
 
 	public void payWinner(Game myGame) {
-		double payment=(myGame.pot/myGame.winners);
-		for (int k=0;k<myGame.maxPlayers;k++) {
-			if (myGame.allPlayers[k].winner==1) {
-				allPlayers[k].Money+=payment;
-				System.out.println(allPlayers[k].Name+" wins "+payment+"$");
+		double payment = (myGame.pot / myGame.winners);
+		for (int k = 0; k < myGame.maxPlayers; k++) {
+			if (myGame.allPlayers[k].winner == 1) {
+				allPlayers[k].Money += payment;
+				System.out.println(allPlayers[k].Name + " wins " + payment + "$");
 			}
 		}
 	}
-	
-	
+
 	public static void printStats(Game myGame) {
 		System.out.println("-------------------------------------------------");
 		System.out.println("-------------------------------------------------");
@@ -315,19 +319,19 @@ public class Game {
 		System.out.println("----------------");
 
 		myGame.activePlayers = myGame.maxPlayers;
-		myGame.winners=0;
+		myGame.winners = 0;
 		myGame.pot = 0;
 		myGame.maxBet = 0;
 		myGame.fair = 0;
 		myGame.showdown = 1;
-		myGame.raiseLowLimit = 0;
-		
-		for (int k=0;k<myGame.maxPlayers;k++) {
+		myGame.raiseLowLimit = myGame.bb;
+
+		for (int k = 0; k < myGame.maxPlayers; k++) {
 			myGame.allPlayers[k].potMoney = 0;
 			myGame.allPlayers[k].action = 0;
 			myGame.allPlayers[k].status = 1;
 			myGame.allPlayers[k].winner = 0;
-			
+
 			myGame.allPlayers[k].rBet = 0;
 		}
 	}
@@ -470,7 +474,8 @@ public class Game {
 	public void raise(Player raiser, Player caller, Game myGame, double bet) {
 		double moneyInPotRightNow = bet - raiser.rBet;
 
-		if (bet > raiser.Money + raiser.rBet || bet < myGame.raiseLowLimit) {
+		if (bet > raiser.Money + raiser.rBet || bet < myGame.raiseLowLimit
+				|| (bet > (caller.Money + caller.rBet) && (caller.Money + caller.rBet < myGame.raiseLowLimit))) {
 			myGame.call(raiser, myGame);
 
 		} else {
@@ -492,6 +497,7 @@ public class Game {
 			myGame.fair = 0;
 			raiser.action = 4;
 			System.out.println(raiser.Name + " Raises to " + myGame.maxBet + "$");
+
 		}
 	}
 
@@ -510,7 +516,6 @@ public class Game {
 
 	public void checkWinner(Game myGame) {
 		int maxCard = -1;
-		
 
 		for (int k = 0; k < myGame.maxPlayers; k++) {
 			if (allPlayers[k].status == 1) {
@@ -520,13 +525,13 @@ public class Game {
 			}
 
 		}
-		
-		for (int k=0;k<myGame.maxPlayers;k++) {
-			if (allPlayers[k].Card1==maxCard) {
-				allPlayers[k].winner=1;
+
+		for (int k = 0; k < myGame.maxPlayers; k++) {
+			if (allPlayers[k].Card1 == maxCard) {
+				allPlayers[k].winner = 1;
 				allPlayers[k].wins++;
 				myGame.winners++;
-				
+
 			}
 		}
 	}
