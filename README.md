@@ -2,7 +2,7 @@ Welcome to the pokerAI wiki!
 
 # Version V1:
 
-
+(This is a project left unfinished. Plans for the future can be found below.)
 
 pokerAI.name="**PzkD**";
 
