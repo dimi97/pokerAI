@@ -2,7 +2,7 @@ Welcome to the pokerAI wiki!
 
 # Version V1:
 
-(This is a project left unfinished. Plans for the future can be found below.)
+(This is a project I started to learn how to build my own Neural Network application from scratch. It is not yet finished, but the summary of planned end result can be found below.)
 
 pokerAI.name="**PzkD**";
 
